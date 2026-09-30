@@ -1,0 +1,94 @@
+{
+  "run_id": "616f6e3c-c198-418d-997b-2b943b869152",
+  "basin_id": "san-roque",
+  "generated_at": "2026-09-23T13:12:41.354045+00:00",
+  "status": "completed",
+  "risk": "CRITICAL",
+  "bloom_probability": 0.989,
+  "data_quality": "acceptable",
+  "quality_report": {
+    "accepted": 3,
+    "rejected": [],
+    "duplicates_removed": 0,
+    "missing_sources": [],
+    "maximum_age_hours": 30,
+    "acceptable": true
+  },
+  "model_versions": {
+    "orchestrator": "phase-6",
+    "physics": "synthetic-physics@v1.0",
+    "ml": "synthetic-ml@v1.0",
+    "ensemble": "weighted-dynamic-v1",
+    "assimilation": "explicit-correction-v1"
+  },
+  "approval": {
+    "decision": "approved",
+    "user_id": "t-1",
+    "user_name": "Tester",
+    "user_role": "LIMNOLOGIST",
+    "comment": "test",
+    "decided_at": "2026-09-23T13:12:41.367710+00:00",
+    "risk_level_at_decision": "CRITICAL",
+    "bloom_probability_at_decision": 0.989,
+    "data_quality_at_decision": true
+  },
+  "actuator_commands": [],
+  "audit_log": [
+    {
+      "node": "ingest_observations",
+      "message": "Se recibieron 3 observaciones de ['synthetic'].",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "validate_quality",
+      "message": "Calidad aceptable. 3 aceptadas, 0 rechazadas, 0 duplicados.",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "align_spatiotemporal",
+      "message": "Alineación completada: 3/19 slots cubiertos, 8 variables fusionadas.",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "assimilate_state",
+      "message": "Asimilación completada. Confianza: 0.60. 8 variables corregidas.",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "run_ml_model",
+      "message": "Modelo ML ejecutado: chl_a=118.3, bloom_prob=0.988",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "run_physics_model",
+      "message": "Modelo físico ejecutado: chl_a=135.0, bloom_prob=0.990",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "build_ensemble",
+      "message": "Ensemble construido (pesos: physics=0.40, ml=0.60). chl_a=125.0",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "estimate_uncertainty",
+      "message": "Incertidumbre estimada. Confianza global: 0.570, acuerdo inter-modelo: 0.795",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "classify_risk",
+      "message": "Riesgo clasificado: CRITICAL (bloom_prob=0.989, upper=1.000). 7 impulsores identificados.",
+      "at": "2026-09-23T13:12:41.354045+00:00"
+    },
+    {
+      "node": "request_human_approval",
+      "message": "Aprobación humana: approved por Tester (LIMNOLOGIST). Comentario: test",
+      "at": "2026-09-23T13:12:41.367710+00:00"
+    },
+    {
+      "node": "publish_result",
+      "message": "Resultado Phase 3 publicado. Riesgo: CRITICAL, bloom_prob: 0.989, confianza: 0.570. Decisión humana: approved por Tester (LIMNOLOGIST)",
+      "at": "2026-09-23T13:12:41.367710+00:00"
+    }
+  ],
+  "persisted_at": "2026-09-23T13:12:41.367710+00:00"
+}

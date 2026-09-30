@@ -1,0 +1,90 @@
+{
+  "model_id": "trained-ridge-logit",
+  "model_version": "v1.7d.b4054d25",
+  "basin_id": "basin-san-roque",
+  "horizon_days": 7,
+  "features": [
+    "chlorophyll_a",
+    "temp_surface",
+    "total_phosphorus",
+    "total_nitrogen",
+    "wind_speed",
+    "dissolved_oxygen",
+    "chl_lag1",
+    "chl_trend3",
+    "temp_mean3",
+    "wind_mean3"
+  ],
+  "features_available": [
+    "chlorophyll_a",
+    "temp_surface",
+    "total_phosphorus",
+    "total_nitrogen",
+    "wind_speed",
+    "dissolved_oxygen",
+    "chl_lag1",
+    "chl_trend3",
+    "temp_mean3",
+    "wind_mean3"
+  ],
+  "features_dropped": [],
+  "means": [
+    65.13012388832023,
+    27.225967568299673,
+    0.35607381000902427,
+    4.125405612900335,
+    3.4977725896771186,
+    5.7553937308581515,
+    65.01399174382867,
+    0.3479350245882627,
+    27.2134119314257,
+    3.5020334436844
+  ],
+  "scales": [
+    5.535176172242215,
+    0.783798815390284,
+    0.018261128757797625,
+    0.12956811315503552,
+    0.7402335456284072,
+    0.22762882021374256,
+    5.713203940005672,
+    1.907365937706943,
+    0.7996574289749326,
+    0.492383439308109
+  ],
+  "ridge": {
+    "coef": [
+      -2.61071991630176,
+      1.899375544648919,
+      0.160497212896143,
+      0.37113422628138365,
+      -0.11010772984375591,
+      -1.0256492793927785,
+      -1.4401881594027217,
+      0.013672491768347563,
+      -0.5619967415114087,
+      0.2153111294359462
+    ],
+    "intercept": 0.6415349659223729,
+    "alpha": 1.0
+  },
+  "logistic": null,
+  "event_base_rate": 1.0,
+  "microcystin_ratio": 0.15941847170621368,
+  "metrics_train": {
+    "mae_delta": 1.542827978501855,
+    "mae_persistence": 2.35300914573273,
+    "improvement_pct": 34.4317049808399,
+    "n_samples": 142
+  },
+  "dataset": {
+    "source": "synthetic",
+    "path": null,
+    "rows": 150,
+    "start": "2026-04-27 00:00:00+00:00",
+    "end": "2026-09-23 00:00:00+00:00",
+    "fingerprint": "b4054d2525f83310",
+    "note": "Histórico SIMULADO por el generador fenomenológico del gemelo (semilla fija). Las métricas describen la capacidad de aprender la dinámica del simulador, no la naturaleza. Para validar la hipótesis con datos reales, defina OAPAT_DATASET_CSV."
+  },
+  "trained_at": "2026-09-23T15:07:08.307000+00:00"
+}

@@ -1,0 +1,158 @@
+{
+  "id": "aquatwin-limnology-copilot",
+  "name": "AquaTwin Limnological Copilot",
+  "description": "Flujo conversacional y prescriptivo de IA Limnológica para el gemelo digital AquaTwin HAB (floraciones algales, boyas IoT, Sentinel-2 y mitigación).",
+  "endpoint_name": "aquatwin-limnology-copilot",
+  "data": {
+    "nodes": [
+      {
+        "id": "ChatInput-1",
+        "type": "genericNode",
+        "position": { "x": 100, "y": 250 },
+        "data": {
+          "type": "ChatInput",
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "value": "Consulta del operador limnológico",
+                "name": "input_value",
+                "display_name": "Mensaje de Entrada",
+                "info": "Pregunta o instrucción del operador de AquaTwin"
+              },
+              "should_store_message": {
+                "type": "bool",
+                "value": true,
+                "name": "should_store_message",
+                "display_name": "Almacenar Mensaje"
+              }
+            },
+            "description": "Entrada de chat desde el panel de AquaTwin Copilot.",
+            "display_name": "Chat Input (AquaTwin)"
+          }
+        }
+      },
+      {
+        "id": "Prompt-1",
+        "type": "genericNode",
+        "position": { "x": 420, "y": 200 },
+        "data": {
+          "type": "Prompt",
+          "node": {
+            "template": {
+              "template": {
+                "type": "multiline",
+                "value": "Eres AquaTwin AI Copilot, un asistente avanzado de limnología computacional, teledetección bio-óptica y gemelo digital para la predicción y mitigación de floraciones de algas nocivas (HAB/FAN).\n\nContexto del Embalse:\n- Nombre: {basin_name}\n- Rol del Usuario: {user_role}\n\nConocimiento de Dominio AquaTwin:\n- Sensores IoT: Temperatura del agua, pH, Oxígeno Disuelto (% sat y mg/L), Clorofila-a, Ficocianina (células/mL), Fósforo y Nitrógeno total, Radiación PAR.\n- Bio-óptica Satelital: Índices Sentinel-2 / Landsat-9 (NDCI, FAI, SABI, turbidez).\n- Mitigación y Acción: Aireación hipolimnética, dosificación de coagulantes ecológicos (PAC/quitosano), dispersores ultrasónicos y reconfiguración de niveles de tomas de agua potable.\n\nInstrucciones:\n1. Responde de forma técnica, concisa y orientada a la toma de decisiones.\n2. Si el usuario pregunta por recomendaciones, proporciona medidas prescriptivas graduadas (físicas, químicas o de gestión).\n3. Responde siempre en español.\n\nPregunta / Instrucción del operador:\n{message}",
+                "name": "template",
+                "display_name": "Plantilla Limnológica"
+              },
+              "basin_name": {
+                "type": "str",
+                "value": "Embalse Central",
+                "name": "basin_name",
+                "display_name": "Nombre Embalse"
+              },
+              "user_role": {
+                "type": "str",
+                "value": "Científico Limnólogo",
+                "name": "user_role",
+                "display_name": "Rol Operador"
+              },
+              "message": {
+                "type": "str",
+                "value": "",
+                "name": "message",
+                "display_name": "Mensaje"
+              }
+            },
+            "description": "Formatea el contexto del embalse y la consulta para el modelo de lenguaje.",
+            "display_name": "Prompt Limnológico AquaTwin"
+          }
+        }
+      },
+      {
+        "id": "OpenAIModel-1",
+        "type": "genericNode",
+        "position": { "x": 780, "y": 220 },
+        "data": {
+          "type": "OpenAIModel",
+          "node": {
+            "template": {
+              "model_name": {
+                "type": "str",
+                "value": "gpt-4.1-mini",
+                "name": "model_name",
+                "display_name": "Modelo"
+              },
+              "temperature": {
+                "type": "float",
+                "value": 0.3,
+                "name": "temperature",
+                "display_name": "Temperatura"
+              },
+              "max_tokens": {
+                "type": "int",
+                "value": 900,
+                "name": "max_tokens",
+                "display_name": "Tokens Máximos"
+              },
+              "api_key": {
+                "type": "str",
+                "value": "",
+                "name": "api_key",
+                "display_name": "OpenAI API Key (o variable de entorno)"
+              }
+            },
+            "description": "Motor de inferencia LLM para análisis limnológico.",
+            "display_name": "OpenAI LLM Engine"
+          }
+        }
+      },
+      {
+        "id": "ChatOutput-1",
+        "type": "genericNode",
+        "position": { "x": 1120, "y": 250 },
+        "data": {
+          "type": "ChatOutput",
+          "node": {
+            "template": {
+              "input_value": {
+                "type": "str",
+                "value": "",
+                "name": "input_value",
+                "display_name": "Respuesta Generada"
+              }
+            },
+            "description": "Devuelve la recomendación diagnóstica generada a AquaTwin Copilot.",
+            "display_name": "Chat Output (AquaTwin)"
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "source": "ChatInput-1",
+        "target": "Prompt-1",
+        "sourceHandle": "message",
+        "targetHandle": "message"
+      },
+      {
+        "source": "Prompt-1",
+        "target": "OpenAIModel-1",
+        "sourceHandle": "prompt",
+        "targetHandle": "input_value"
+      },
+      {
+        "source": "OpenAIModel-1",
+        "target": "ChatOutput-1",
+        "sourceHandle": "text",
+        "targetHandle": "input_value"
+      }
+    ],
+    "viewport": {
+      "x": 40,
+      "y": 80,
+      "zoom": 0.95
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "embalse": "Falling Creek Reservoir (FCR), Vinton, Virginia, EE. UU.",
+  "coordenadas": [
+    37.30333,
+    -79.8375
+  ],
+  "fuente_agua": "LakeBeD-US CSE (eco-kgml/LakeBeD-US-CSE), CC-BY-4.0, DOI 10.5194/essd-17-3141-2025 — Carey Lab / Virginia Reservoirs LTREB",
+  "fuente_meteo": "Open-Meteo Historical Weather API (reanálisis ERA5), CC-BY-4.0",
+  "profundidad_superficie_m": 2.0,
+  "interpolacion": {
+    "limite_dias": 21,
+    "fraccion_interpolada": {
+      "total_phosphorus": 0.8617,
+      "total_nitrogen": 0.8617,
+      "soluble_phosphorus": 0.8606,
+      "ammonium": 0.8606,
+      "nitrate": 0.8606,
+      "doc": 0.8617,
+      "secchi": 0.8715
+    }
+  },
+  "sesgo_sonda_vs_laboratorio_ugl": -7.9,
+  "correlacion_sonda_laboratorio_r": 0.15,
+  "advertencia": "La clorofila-a procede mayoritariamente de una sonda de fluorescencia fija a 1,6 m. Lee ~7,9 µg/L por debajo de la clorofila extraída en laboratorio y correlaciona poco con ella (r=0,15, n=130). Aplicar los umbrales de la OMS sobre este valor SUB-ALERTA. El viento es reanálisis ERA5, no un anemómetro en el embalse.",
+  "rango": [
+    "2015-08-03",
+    "2023-12-31"
+  ],
+  "dias": 1960
+}

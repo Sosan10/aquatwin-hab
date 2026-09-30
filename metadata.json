@@ -1,0 +1,6 @@
+{
+  "name": "AquaTwin HAB - 3D Digital Twin",
+  "description": "Plataforma de Gemelo Digital 3D basada en datos satelitales, telemetría IoT y Machine Learning para la alerta temprana de floraciones de algas nocivas (FAN/HAB) en cuerpos de agua.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_OPENAI_API"]
+}

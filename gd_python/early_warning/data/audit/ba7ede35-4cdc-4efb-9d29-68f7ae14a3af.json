@@ -1,0 +1,117 @@
+{
+  "run_id": "ba7ede35-4cdc-4efb-9d29-68f7ae14a3af",
+  "basin_id": "san-roque",
+  "generated_at": "2026-09-16T14:36:47.272474+00:00",
+  "status": "completed",
+  "risk": "CRITICAL",
+  "bloom_probability": 0.9393,
+  "data_quality": "acceptable",
+  "quality_report": {
+    "accepted": 3,
+    "rejected": [],
+    "duplicates_removed": 0,
+    "missing_sources": [],
+    "maximum_age_hours": 30,
+    "acceptable": true
+  },
+  "model_versions": {
+    "orchestrator": "phase-6",
+    "physics": "synthetic-physics@v1.0",
+    "ml": "synthetic-ml@v1.0",
+    "ensemble": "weighted-dynamic-v1",
+    "assimilation": "explicit-correction-v1"
+  },
+  "approval": {
+    "decision": "approved",
+    "user_id": "usr-01",
+    "user_name": "Dra.",
+    "user_role": "LIMNOLOGIST",
+    "comment": "",
+    "decided_at": "2026-09-16T14:36:47.306749+00:00",
+    "risk_level_at_decision": "CRITICAL",
+    "bloom_probability_at_decision": 0.9393,
+    "data_quality_at_decision": true
+  },
+  "actuator_commands": [
+    {
+      "at": "2026-09-16T14:36:47.329084+00:00",
+      "user_id": "usr-02",
+      "user_name": "Ing. Benítez",
+      "user_role": "OPERATOR",
+      "device_id": "act-01",
+      "command": "AERATOR_ON",
+      "power_level": 100.0,
+      "status": "ACKNOWLEDGED_SIMULATED",
+      "approved_by": "Dra.",
+      "approval_decided_at": "2026-09-16T14:36:47.306749+00:00"
+    }
+  ],
+  "audit_log": [
+    {
+      "node": "ingest_observations",
+      "message": "Se recibieron 3 observaciones de ['synthetic'].",
+      "at": "2026-09-16T14:36:47.277363+00:00"
+    },
+    {
+      "node": "validate_quality",
+      "message": "Calidad aceptable. 3 aceptadas, 0 rechazadas, 0 duplicados.",
+      "at": "2026-09-16T14:36:47.278457+00:00"
+    },
+    {
+      "node": "align_spatiotemporal",
+      "message": "Alineación completada: 3/19 slots cubiertos, 8 variables fusionadas.",
+      "at": "2026-09-16T14:36:47.279599+00:00"
+    },
+    {
+      "node": "assimilate_state",
+      "message": "Asimilación completada. Confianza: 0.60. 8 variables corregidas.",
+      "at": "2026-09-16T14:36:47.280548+00:00"
+    },
+    {
+      "node": "run_ml_model",
+      "message": "Modelo ML ejecutado: chl_a=91.1, bloom_prob=0.926",
+      "at": "2026-09-16T14:36:47.281534+00:00"
+    },
+    {
+      "node": "run_physics_model",
+      "message": "Modelo físico ejecutado: chl_a=99.4, bloom_prob=0.959",
+      "at": "2026-09-16T14:36:47.282631+00:00"
+    },
+    {
+      "node": "build_ensemble",
+      "message": "Ensemble construido (pesos: physics=0.40, ml=0.60). chl_a=94.4",
+      "at": "2026-09-16T14:36:47.283143+00:00"
+    },
+    {
+      "node": "estimate_uncertainty",
+      "message": "Incertidumbre estimada. Confianza global: 0.644, acuerdo inter-modelo: 0.901",
+      "at": "2026-09-16T14:36:47.283143+00:00"
+    },
+    {
+      "node": "classify_risk",
+      "message": "Riesgo clasificado: CRITICAL (bloom_prob=0.939, upper=0.997). 7 impulsores identificados.",
+      "at": "2026-09-16T14:36:47.286017+00:00"
+    },
+    {
+      "node": "request_human_approval",
+      "message": "Aprobación humana: approved por Dra. (LIMNOLOGIST). Comentario: —",
+      "at": "2026-09-16T14:36:47.306749+00:00"
+    },
+    {
+      "node": "publish_result",
+      "message": "Resultado Phase 3 publicado. Riesgo: CRITICAL, bloom_prob: 0.939, confianza: 0.644. Decisión humana: approved por Dra. (LIMNOLOGIST)",
+      "at": "2026-09-16T14:36:47.306749+00:00"
+    },
+    {
+      "node": "dispatch_actuator",
+      "at": "2026-09-16T14:36:47.312939+00:00",
+      "message": "RECHAZADO (El rol LIMNOLOGIST no puede accionar actuadores. Roles autorizados: ['ADMIN', 'OPERATOR']): AERATOR_ON → act-01 por Ing. Benítez (LIMNOLOGIST)"
+    },
+    {
+      "node": "dispatch_actuator",
+      "at": "2026-09-16T14:36:47.329084+00:00",
+      "message": "ACEPTADO: AERATOR_ON → act-01 por Ing. Benítez (OPERATOR), amparado en la aprobación de Dra."
+    }
+  ],
+  "persisted_at": "2026-09-16T14:36:47.329084+00:00"
+}
