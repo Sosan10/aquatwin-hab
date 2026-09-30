@@ -5,12 +5,12 @@ directamente incrustadas en el documento Word (.docx) y vinculadas en el Markdow
 
 import os
 import sys
-import docx
-from docx.shared import Inches, Pt, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT
-from docx.oxml import parse_xml
-from docx.oxml.ns import nsdecls
+import docx  # type: ignore
+from docx.shared import Inches, Pt, RGBColor  # type: ignore
+from docx.enum.text import WD_ALIGN_PARAGRAPH  # type: ignore
+from docx.enum.table import WD_TABLE_ALIGNMENT  # type: ignore
+from docx.oxml import parse_xml  # type: ignore
+from docx.oxml.ns import nsdecls  # type: ignore
 
 def set_cell_background(cell, fill_hex):
     tcPr = cell._tc.get_or_add_tcPr()
@@ -243,11 +243,11 @@ def generate_paper():
     r_aff.font.italic = True
     r_aff.font.color.rgb = RGBColor(100, 116, 139)
     
-    log_md("**Daily Ashley Córdova Urbina¹\*, Yoel Armando Solórzano Sánchez¹**\n")
+    log_md(r"**Daily Ashley Córdova Urbina¹\*, Yoel Armando Solórzano Sánchez¹**" + "\n")
     log_md("¹ *Escuela Académico Profesional de Ingeniería de Sistemas, Facultad de Ingeniería, Universidad Nacional de Trujillo, Av. Juan Pablo II s/n, Trujillo 13011, Perú.*  \n"
            "- **Daily Ashley Córdova Urbina** — ORCID iD: [0009-0008-8433-779X](https://orcid.org/0009-0008-8433-779X) | Correo: `T1043300421@unitru.edu.pe`  \n"
            "- **Yoel Armando Solórzano Sánchez** — ORCID iD: [0009-0003-4245-7439](https://orcid.org/0009-0003-4245-7439) | Correo: `ysolorzano@unitru.edu.pe`  \n"
-           "\* *Autor de correspondencia:* `T1043300421@unitru.edu.pe`\n")
+           r"\* *Autor de correspondencia:* `T1043300421@unitru.edu.pe`" + "\n")
     log_md("---\n")
     
     # Abstract ES
