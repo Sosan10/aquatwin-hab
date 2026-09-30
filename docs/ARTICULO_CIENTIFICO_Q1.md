@@ -55,36 +55,12 @@ El área de validación experimental corresponde al Embalse Falling Creek (FCR; 
 La arquitectura del sistema (Figura 1) fue concebida conforme al marco de referencia de gemelos digitales ciberfísicos en ingeniería ambiental (Tao et al., 2020), desacoplada en cuatro capas interoperables: (1) Capa de Ingesta y Asimilación de Datos Ciberfísicos; (2) Capa de Normalización e Imputación Continua (src/gd/serie.ts); (3) Capa de Modelado Físico y Renderizado 3D WebGL (src/components/DigitalTwin3DCanvas.tsx); y (4) Capa de Inferencia Predictiva y Explicabilidad Biofísica (src/gd/prediccion.ts, gd_python/aquatwin/motor/). La comunicación intermodular se gestiona mediante arquitecturas reactivas TypeScript en frontend conectadas mediante sockets RESTful bidireccionales con el microservicio analítico en Python 3.12 (FastAPI).
 
 
-```text
-+-----------------------------------------------------------------------------------------+
-|                             CAPA DE ADQUISICIÓN CIBERFÍSICA                             |
-|   [Sentinel-2 MSI / Landsat-8]           [Boya Station 20]           [Estación Meteo]   |
-|   Bandas B2,B3,B4,B5,B8 (NDCI)         Cadena YSI EXO2 (Chl,OD,T)    Anemómetro, PAR    |
-+--------------------------------------------+--------------------------------------------+
-                                             | Stream continuo OAPAT
-                                             v
-+-----------------------------------------------------------------------------------------+
-|                      MOTOR DEL GEMELO DIGITAL (src/gd/serie.ts)                         |
-|   - Validación QC (filtros Grubbs/Z-Score)        - Fusión Kalman Extendida (EKF)       |
-|   - Imputación PCHIP & Kriging Espacial           - Cálculo de Salto Térmico (Delta-T)  |
-+----------------------+--------------------------------------------------+---------------+
-                       | Malla interpolada                                | Tensores limno
-                       v                                                  v
-+---------------------------------------------+   +---------------------------------------+
-|      RENDERIZADOR 3D THREE.JS (WebGL)       |   |     MOTOR DE PREDICCIÓN & XAI         |
-|   - Malla batimétrica FCR de alta res       |   |   - Reglas limnológicas deterministas |
-|   - Oleaje físico multiharmónico epilimnio  |   |   - Ensamble CNN-LSTM (+24h,+48h,+72h)|
-|   - 2,400 partículas Microcystis brownianas |   |   - Atribución causal XAI (SHAP)      |
-|   - Texturas bio-ópticas fractales de scum  |   |   - Copiloto Langflow Studio          |
-+---------------------------------------------+   +---------------------------------------+
-                                       \                 /
-                                        v               v
-+-----------------------------------------------------------------------------------------+
-|                   INTERFAZ OPERACIONAL DE ALERTA TEMPRANA & WHAT-IF                      |
-|          Modos de Cámara (3D/Cenital) - Matriz CRISP-DM - Exportación Técnica PDF       |
-+-----------------------------------------------------------------------------------------+
-```
+![Figura 1](figures/Figura1_Arquitectura_AquaTwin.png)
 *Figura 1. Arquitectura funcional integral del Gemelo Digital Limnológico (AquaTwin HAB).*
+
+
+![Figura 2](figures/Figura2_Batimetria_Red_Boyas_FCR.png)
+*Figura 2. Perfil batimétrico tridimensional y distribución de la red telemétrica en Falling Creek Reservoir.*
 
 ### 2.3. Asimilación Multiespectral e In Situ
 El módulo de asimilación integra la reflectancia de superficie ρ_w(λ) del sensor multiespectral Sentinel-2 MSI (procesadas a nivel 2A mediante corrección atmosférica C2RCC y ACOLITE) con los registros fluorométricos de la sonda EXO2. Para estimar la biomasa de clorofila-a satelital en aguas ópticamente complejas (Case-2 waters), se computó el Índice Normalizado de Diferencia de Clorofila (NDCI), formulado conforme a Mishra & Mishra (2012):
@@ -114,6 +90,10 @@ dX_t = (u_flow(X_t) + v_stokes) dt + sqrt(2 D_turb) dW_t                        
 v_stokes = (2 / 9) · (g · r_col² / μ_w) · (ρ_w - ρ_cell)                                      (5)
 
 Bajo estratificación térmica estival con hipoxia en el fondo (ΔT ≥ 1.0 °C), la densidad celular ρ_cell decae por debajo de la densidad del agua circundante (ρ_cell < ρ_w), forzando a las colonias a mantenerse confinadas en la capa epilimnética superficial (profundidad z entre -0.02 m y -0.60 m). Si la velocidad del viento local U_10 decae por debajo del umbral crítico de mezcla de 3.0 m/s (Reynolds, 2006), la tasa de disipación turbulenta se anula (D_turb → 0), induciendo la coalescencia de las partículas en filamentos amorfos de alta concentración visual (verdín o scum superficial).
+
+
+![Figura 3](figures/Figura3_Dinamica_Oleaje_Particulas.png)
+*Figura 3. Dinámica de oleaje superficial multiharmónico y dispersión colonial browniana.*
 
 
 **Tabla 3.** Parámetros físicos e hidrodinámicos calibrados para la simulación 3D de oleaje y cinemática colonial.
@@ -155,41 +135,15 @@ Para el estado de 'Alerta' (25 a 50 μg/L de Chl-a), que desencadena la adverten
 ### 3.3. Dinámica Espacio-Temporal y Reconstrucción 3D
 La Figura 4 ilustra una serie temporal representativa de 14 días durante un evento hipertrófico de floración registrado en el embalse FCR. Se aprecia cómo el incremento súbito de temperatura epilimnética (alcanzando 27.8 °C) y la caída en la velocidad del viento por debajo de 1.8 m/s desencadenan un ascenso vertiginoso de clorofila-a desde 8.5 μg/L hasta 46.2 μg/L en un lapso de 48 horas. Las observaciones asimiladas del sensor Sentinel-2 MSI (puntos romboidales) corroboran la trayectoria predicha por el ensamble híbrido a +48h (línea continua cian), mientras que el modelo estocástico lineal no logró anticipar la velocidad de crecimiento exponencial al carecer del forzamiento termoclínico.
 
-En el plano visual tridimensional (Figura 3), el lienzo procedimental de 1024×1024 resuelve de manera orgánica los frentes de nata verde (Chl-a > 25 μg/L), formando bandas filamentosas que convergen en la ensenada de Station 20 impulsadas por la circulación hidrodinámica simulada, eliminando por completo los gradientes concéntricos artificiales de los modelos raster bidimensionales tradicionales.
 
-
-```text
-Concentración Chl-a [ug/L]
- 50 |                                                         *** (Alerta Crítica)
-    |                                                       **   *
- 40 |                                                     **       *
-    |                                           [S2]    **           *
- 30 |                                                 **               *
-    |                                      [S2]     **                   *
- 20 |                                             **                       *
-    |                              *            **                           *
- 10 |                 [S2]       *   *        **                               * ---- Umbral Alerta (25 ug/L)
-    |    * * * * * * *         *       *    **
-  0 +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----
-    Día 1   Día 2   Día 3   Día 4   Día 5   Día 6   Día 7   Día 8   Día 9  Día 10
-    Leyenda: [* *] Sensor in situ (EXO2)  |  [S2] Sentinel-2 NDCI  |  (***) Pronóstico AquaTwin +48h
-```
+![Figura 4](figures/Figura4_Serie_Temporal_Pronostico_72h.png)
 *Figura 4. Comparación entre mediciones in situ, asimilación satelital Sentinel-2 y pronóstico híbrido (+48h) en FCR.*
 
 ### 3.4. Atribución Causal Limnológica (XAI)
 El análisis de explicabilidad causal mediante valores SHAP (Figura 5) descompone los factores biofísicos que determinaron la transición hacia el estado de alerta. Durante el periodo de máxima proliferación, el factor de mayor contribución neta positiva fue la persistencia de la estratificación térmica epilimnio-hipolimnio (ΔT ≥ 7.2 °C), aportando un valor SHAP medio de +11.4 μg/L de biomasa de Chl-a. El segundo forzante preponderante fue la acumulación de radiación PAR durante las 48 horas previas (+6.8 μg/L), seguido por la quietud del viento superficial (U_10 < 2.0 m/s; contribución de +4.2 μg/L debido a la ausencia de mezcla turbulenta). En contraste, los pulsos de viento superiores a 4.5 m/s actuaron como el principal forzante negativo (-8.1 μg/L), induciendo desestabilización convectiva del epilimnio.
 
 
-```text
-Factor Limnológico / Variable         Valor SHAP Medio (Impacto sobre Chl-a [ug/L])
-------------------------------------+--------------------------------------------------
-Salto Térmico Vertical (Delta-T)    | [===========================>] +11.4 ug/L (Fuerte estratificación)
-Radiación PAR Acumulada (48h)       | [=================>] +6.8 ug/L (Foto-activación celular)
-Velocidad de Viento Baja (< 2 m/s)  | [===========>] +4.2 ug/L (Ausencia de dispersión física)
-Temperatura Agua Epilimnética       | [========>] +3.1 ug/L (Optimización metabólica Microcystis)
-Velocidad de Viento Alta (> 4 m/s)  | [<<<<<<<<<<<<<<<<<<] -8.1 ug/L (Dispersión convectiva/mezcla)
-Profundidad de Secchi Reducida      | [====>] +1.8 ug/L (Auto-sombreado por turbidez biogénica)
-```
+![Figura 5](figures/Figura5_Explicabilidad_SHAP_Limnologia.png)
 *Figura 5. Diagrama de explicabilidad SHAP para factores biofísicos determinantes.*
 
 ### 3.5. Rendimiento Computacional y Latencia
@@ -202,17 +156,7 @@ Para evaluar la viabilidad de despliegue operacional en salas de control y orden
 El módulo interactivo de simulación What-If (Figura 6) permitió ensayar virtualmente tres contramedidas operativas en FCR: (a) activación de aireación hipolimnética con mezcla forzada artificial (induciendo caída de ΔT a 0.5 °C y viento efectivo de 5.0 m/s); (b) reducción del 40% en el aporte de nutrientes de cuenca; y (c) incremento de descarga de fondo. La simulación reveló que la inducción de mezcla artificial desestabiliza la ventaja de flotabilidad de Microcystis en menos de 18 horas, reduciendo la concentración de clorofila-a superficial desde 42 μg/L hasta 14 μg/L, demostrando la utilidad del gemelo digital como banco de pruebas virtual para la gestión hídrica.
 
 
-```text
-Respuesta de Clorofila-a en Simulación 'What-If' [ug/L]
- 50 |   * * * (Escenario Base: Sin intervención, florecimiento descontrolado -> 48 ug/L)
- 40 |  *     *
- 30 | *       * - - - - - - - - (Escenario B: Reducción 40% nutrientes cuenca -> 29 ug/L)
- 20 |*         * * * * * * * *
- 10 |*          ================= (Escenario A: Aireación forzada con mezcla artificial -> 14 ug/L)
-  0 +----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----
-    T0   +6h   +12h  +18h  +24h  +30h  +36h  +42h  +48h  +60h  +72h
-    Impacto: La mezcla forzada elimina la estratificación térmica y dispersa la biomasa bajo la zona fótica.
-```
+![Figura 6](figures/Figura6_Escenarios_Intervencion_WhatIf.png)
 *Figura 6. Respuesta temporal de biomasa bajo tres escenarios de intervención 'What-If'.*
 
 ---

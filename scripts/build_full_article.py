@@ -1,9 +1,6 @@
 """
-Script principal para la generación íntegra del artículo de investigación para revista Q1.
-Genera simultáneamente:
-- docs/ARTICULO_CIENTIFICO_Q1.md
-- docs/Articulo_Cientifico_Q1.docx
-- Articulo_Cientifico_Q1.docx (en la raíz para fácil acceso del autor)
+Script para compilar el artículo científico Q1 con imágenes de alta resolución (.png)
+directamente incrustadas en el documento Word (.docx) y vinculadas en el Markdown (.md).
 """
 
 import os
@@ -12,21 +9,179 @@ import docx
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
-# Import routines
-from paper_routines import (
-    set_cell_background,
-    set_cell_margins,
-    add_header_footer,
-    insert_table,
-    insert_figure,
-    add_p,
-    add_h1,
-    add_h2
-)
+def set_cell_background(cell, fill_hex):
+    tcPr = cell._tc.get_or_add_tcPr()
+    shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>')
+    tcPr.append(shd)
+
+def set_cell_margins(cell, top=70, bottom=70, left=90, right=90):
+    tcPr = cell._tc.get_or_add_tcPr()
+    tcMar = parse_xml(
+        f'<w:tcMar {nsdecls("w")}>'
+        f'<w:top w:w="{top}" w:type="dxa"/>'
+        f'<w:bottom w:w="{bottom}" w:type="dxa"/>'
+        f'<w:left w:w="{left}" w:type="dxa"/>'
+        f'<w:right w:w="{right}" w:type="dxa"/>'
+        f'</w:tcMar>'
+    )
+    tcPr.append(tcMar)
+
+def add_header_footer(doc):
+    for s in doc.sections:
+        s.top_margin = Inches(1.0)
+        s.bottom_margin = Inches(1.0)
+        s.left_margin = Inches(1.0)
+        s.right_margin = Inches(1.0)
+        
+        header = s.header
+        hp = header.paragraphs[0]
+        hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        hrun = hp.add_run("Water Research / Environmental Modelling & Software — Manuscript (Q1)")
+        hrun.font.name = "Times New Roman"
+        hrun.font.size = Pt(8.5)
+        hrun.font.italic = True
+        hrun.font.color.rgb = RGBColor(100, 116, 139)
+        
+        footer = s.footer
+        fp = footer.paragraphs[0]
+        fp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        frun = fp.add_run("Solorzano-Sanchez et al. (2026) — Gemelo Digital Limnológico para Alerta Temprana de HABs")
+        frun.font.name = "Times New Roman"
+        frun.font.size = Pt(8.5)
+        frun.font.color.rgb = RGBColor(148, 163, 184)
+
+def insert_table(doc, headers, data, caption, col_widths=None):
+    cp = doc.add_paragraph()
+    cp.paragraph_format.space_before = Pt(14)
+    cp.paragraph_format.space_after = Pt(4)
+    cpr = cp.add_run(caption)
+    cpr.font.name = "Times New Roman"
+    cpr.font.size = Pt(9.5)
+    cpr.font.bold = True
+    cpr.font.color.rgb = RGBColor(15, 23, 42)
+    
+    table = doc.add_table(rows=len(data) + 1, cols=len(headers))
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    
+    if col_widths and len(col_widths) == len(headers):
+        for row in table.rows:
+            for idx, w in enumerate(col_widths):
+                row.cells[idx].width = Inches(w)
+                
+    for idx, h in enumerate(headers):
+        cell = table.cell(0, idx)
+        set_cell_background(cell, "1E293B")
+        set_cell_margins(cell, top=80, bottom=80, left=80, right=80)
+        p = cell.paragraphs[0]
+        r = p.add_run(h)
+        r.font.name = "Times New Roman"
+        r.font.size = Pt(8.5)
+        r.font.bold = True
+        r.font.color.rgb = RGBColor(255, 255, 255)
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+    for r_idx, row_values in enumerate(data):
+        row = table.rows[r_idx + 1]
+        bg = "F8FAFC" if r_idx % 2 == 0 else "FFFFFF"
+        for c_idx, val in enumerate(row_values):
+            cell = row.cells[c_idx]
+            set_cell_background(cell, bg)
+            set_cell_margins(cell, top=60, bottom=60, left=70, right=70)
+            p = cell.paragraphs[0]
+            r = p.add_run(str(val))
+            r.font.name = "Times New Roman"
+            r.font.size = Pt(8.5)
+            r.font.color.rgb = RGBColor(30, 41, 59)
+            if c_idx > 0 and (val.replace('.', '', 1).replace('-', '', 1).isdigit() or '%' in val or '±' in val or '<' in val):
+                p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            else:
+                p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                
+    sp = doc.add_paragraph()
+    sp.paragraph_format.space_before = Pt(2)
+    sp.paragraph_format.space_after = Pt(8)
+
+def insert_figure(doc, fig_id, title, desc, img_path, width_in=6.2):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(14)
+    p.paragraph_format.space_after = Pt(4)
+    r_id = p.add_run(f"Figura {fig_id}. ")
+    r_id.font.name = "Times New Roman"
+    r_id.font.size = Pt(9.5)
+    r_id.font.bold = True
+    r_id.font.color.rgb = RGBColor(15, 23, 42)
+    
+    r_title = p.add_run(title)
+    r_title.font.name = "Times New Roman"
+    r_title.font.size = Pt(9.5)
+    r_title.font.bold = True
+    r_title.font.color.rgb = RGBColor(30, 41, 59)
+    
+    if os.path.exists(img_path):
+        img_p = doc.add_paragraph()
+        img_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        img_p.paragraph_format.space_before = Pt(6)
+        img_p.paragraph_format.space_after = Pt(6)
+        run_img = img_p.add_run()
+        run_img.add_picture(img_path, width=Inches(width_in))
+        
+    dp = doc.add_paragraph()
+    dp.paragraph_format.space_before = Pt(4)
+    dp.paragraph_format.space_after = Pt(12)
+    dr = dp.add_run(desc)
+    dr.font.name = "Times New Roman"
+    dr.font.size = Pt(8.5)
+    dr.font.italic = True
+    dr.font.color.rgb = RGBColor(71, 85, 105)
+
+def add_p(doc, text, bold_prefix=None, italic=False, space_after=6, line_spacing=1.15):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(space_after)
+    p.paragraph_format.line_spacing = line_spacing
+    
+    if bold_prefix:
+        r_pre = p.add_run(bold_prefix)
+        r_pre.font.name = "Times New Roman"
+        r_pre.font.size = Pt(11)
+        r_pre.font.bold = True
+        r_pre.font.color.rgb = RGBColor(15, 23, 42)
+        
+    r = p.add_run(text)
+    r.font.name = "Times New Roman"
+    r.font.size = Pt(11)
+    r.font.italic = italic
+    r.font.color.rgb = RGBColor(30, 41, 59)
+    return p
+
+def add_h1(doc, text):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(16)
+    p.paragraph_format.space_after = Pt(6)
+    r = p.add_run(text)
+    r.font.name = "Times New Roman"
+    r.font.size = Pt(14)
+    r.font.bold = True
+    r.font.color.rgb = RGBColor(15, 23, 42)
+    return p
+
+def add_h2(doc, text):
+    p = doc.add_paragraph()
+    p.paragraph_format.space_before = Pt(12)
+    p.paragraph_format.space_after = Pt(4)
+    r = p.add_run(text)
+    r.font.name = "Times New Roman"
+    r.font.size = Pt(12)
+    r.font.bold = True
+    r.font.color.rgb = RGBColor(30, 41, 59)
+    return p
 
 def generate_paper():
     base_dir = os.path.abspath(r"c:\Users\crema\Downloads\aquatwin-hab---3d-digital-twin")
+    fig_dir = os.path.join(base_dir, "docs", "figures")
     md_file = os.path.join(base_dir, "docs", "ARTICULO_CIENTIFICO_Q1.md")
     docx_file = os.path.join(base_dir, "docs", "Articulo_Cientifico_Q1.docx")
     docx_root = os.path.join(base_dir, "Articulo_Cientifico_Q1.docx")
@@ -38,7 +193,7 @@ def generate_paper():
     def log_md(text=""):
         md_lines.append(text)
         
-    print("Redactando encabezado y metadatos del artículo...")
+    print("Iniciando compilación del artículo científico Q1 con imágenes incrustadas...")
     
     # Title
     p_title = doc.add_paragraph()
@@ -111,8 +266,6 @@ def generate_paper():
         "en una respuesta anticipatoria basada en evidencia biofísica."
     )
     add_p(doc, resumen_text)
-    
-    # Keywords ES
     add_p(doc, "Gemelo digital limnológico, floraciones de algas nocivas (HAB), Microcystis aeruginosa, asimilación de datos, Three.js, Sentinel-2 MSI, redes neuronales híbridas, alerta temprana, Falling Creek Reservoir.", bold_prefix="Palabras clave: ")
     
     log_md("### Resumen\n" + resumen_text + "\n\n**Palabras clave:** Gemelo digital limnológico, floraciones de algas nocivas (HAB), Microcystis aeruginosa, asimilación de datos, Three.js, Sentinel-2 MSI, redes neuronales híbridas, alerta temprana, Falling Creek Reservoir.\n")
@@ -149,7 +302,6 @@ def generate_paper():
     doc.add_page_break()
     
     # 1. INTRODUCCIÓN
-    print("Redactando Sección 1: Introducción...")
     add_h1(doc, "1. Introducción")
     log_md("## 1. Introducción\n")
     
@@ -223,7 +375,6 @@ def generate_paper():
     log_md(p5 + "\n\n---\n")
     
     # 2. MATERIALES Y MÉTODOS
-    print("Redactando Sección 2: Materiales y Métodos...")
     add_h1(doc, "2. Materiales y Métodos")
     log_md("## 2. Materiales y Métodos\n")
     
@@ -274,38 +425,17 @@ def generate_paper():
     add_p(doc, p_arch)
     log_md("### 2.2. Arquitectura Funcional del Gemelo Digital Limnológico\n" + p_arch + "\n")
     
-    fig1_ascii = (
-        "+-----------------------------------------------------------------------------------------+\n"
-        "|                             CAPA DE ADQUISICIÓN CIBERFÍSICA                             |\n"
-        "|   [Sentinel-2 MSI / Landsat-8]           [Boya Station 20]           [Estación Meteo]   |\n"
-        "|   Bandas B2,B3,B4,B5,B8 (NDCI)         Cadena YSI EXO2 (Chl,OD,T)    Anemómetro, PAR    |\n"
-        "+--------------------------------------------+--------------------------------------------+\n"
-        "                                             | Stream continuo OAPAT\n"
-        "                                             v\n"
-        "+-----------------------------------------------------------------------------------------+\n"
-        "|                      MOTOR DEL GEMELO DIGITAL (src/gd/serie.ts)                         |\n"
-        "|   - Validación QC (filtros Grubbs/Z-Score)        - Fusión Kalman Extendida (EKF)       |\n"
-        "|   - Imputación PCHIP & Kriging Espacial           - Cálculo de Salto Térmico (Delta-T)  |\n"
-        "+----------------------+--------------------------------------------------+---------------+\n"
-        "                       | Malla interpolada                                | Tensores limno\n"
-        "                       v                                                  v\n"
-        "+---------------------------------------------+   +---------------------------------------+\n"
-        "|      RENDERIZADOR 3D THREE.JS (WebGL)       |   |     MOTOR DE PREDICCIÓN & XAI         |\n"
-        "|   - Malla batimétrica FCR de alta res       |   |   - Reglas limnológicas deterministas |\n"
-        "|   - Oleaje físico multiharmónico epilimnio  |   |   - Ensamble CNN-LSTM (+24h,+48h,+72h)|\n"
-        "|   - 2,400 partículas Microcystis brownianas |   |   - Atribución causal XAI (SHAP)      |\n"
-        "|   - Texturas bio-ópticas fractales de scum  |   |   - Copiloto Langflow Studio          |\n"
-        "+---------------------------------------------+   +---------------------------------------+\n"
-        "                                       \\                 /\n"
-        "                                        v               v\n"
-        "+-----------------------------------------------------------------------------------------+\n"
-        "|                   INTERFAZ OPERACIONAL DE ALERTA TEMPRANA & WHAT-IF                      |\n"
-        "|          Modos de Cámara (3D/Cenital) - Matriz CRISP-DM - Exportación Técnica PDF       |\n"
-        "+-----------------------------------------------------------------------------------------+"
-    )
+    # FIGURA 1
+    fig1_path = os.path.join(fig_dir, "Figura1_Arquitectura_AquaTwin.png")
     insert_figure(doc, 1, "Arquitectura funcional integral del Gemelo Digital Limnológico (AquaTwin HAB).", 
-                  "Estructura desacoplada en cuatro capas: adquisición ciberfísica, motor limnológico continuo, renderizado físico 3D en WebGL y ensamble predictivo con explicabilidad XAI.", fig1_ascii)
-    log_md("\n```text\n" + fig1_ascii + "\n```\n*Figura 1. Arquitectura funcional integral del Gemelo Digital Limnológico (AquaTwin HAB).*\n")
+                  "Estructura desacoplada en cuatro capas: adquisición ciberfísica, motor limnológico continuo, renderizado físico 3D en WebGL y ensamble predictivo con explicabilidad XAI.", fig1_path, width_in=6.2)
+    log_md(f"\n![Figura 1](figures/Figura1_Arquitectura_AquaTwin.png)\n*Figura 1. Arquitectura funcional integral del Gemelo Digital Limnológico (AquaTwin HAB).*\n")
+    
+    # FIGURA 2
+    fig2_path = os.path.join(fig_dir, "Figura2_Batimetria_Red_Boyas_FCR.png")
+    insert_figure(doc, 2, "Perfil batimétrico tridimensional y distribución de la red telemétrica en Falling Creek Reservoir.",
+                  "Curvas de nivel de profundidad (0.0 a 9.3 m), ubicación de la boya de fondeo profundo (Station 20 / Deep Hole), boya de ensenada somera (Station 10), estructura de presa y vector de forzamiento por viento dominante.", fig2_path, width_in=5.8)
+    log_md(f"\n![Figura 2](figures/Figura2_Batimetria_Red_Boyas_FCR.png)\n*Figura 2. Perfil batimétrico tridimensional y distribución de la red telemétrica en Falling Creek Reservoir.*\n")
     
     # 2.3 Asimilación
     add_h2(doc, "2.3. Asimilación Multiespectral e In Situ")
@@ -362,6 +492,12 @@ def generate_paper():
     add_p(doc, p_hydro)
     log_md("### 2.4. Modelo Hidrodinámico Capilar y Cinemática de Colonias\n" + p_hydro + "\n")
     
+    # FIGURA 3
+    fig3_path = os.path.join(fig_dir, "Figura3_Dinamica_Oleaje_Particulas.png")
+    insert_figure(doc, 3, "Dinámica de oleaje superficial multiharmónico y dispersión colonial browniana de Microcystis aeruginosa.",
+                  "(a) Perfil temporal de deformación de elevación capilar libre η(u, t) bajo tres instantes desfasados; (b) Función de densidad de probabilidad vertical de 2,400 colonias en la columna de agua bajo estratificación estival frente a mezcla forzada.", fig3_path, width_in=6.2)
+    log_md(f"\n![Figura 3](figures/Figura3_Dinamica_Oleaje_Particulas.png)\n*Figura 3. Dinámica de oleaje superficial multiharmónico y dispersión colonial browniana.*\n")
+    
     # TABLA 3
     t3_headers = ["Parámetro de Simulación", "Símbolo", "Valor Calibrado", "Unidad", "Fundamento Biofísico / Referencia"]
     t3_data = [
@@ -412,7 +548,6 @@ def generate_paper():
     log_md("### 2.6. Explicabilidad Causal y Métricas de Rendimiento\n" + p_xai + "\n\n---\n")
     
     # 3. RESULTADOS
-    print("Redactando Sección 3: Resultados...")
     add_h1(doc, "3. Resultados")
     log_md("## 3. Resultados\n")
     
@@ -476,40 +611,23 @@ def generate_paper():
     insert_table(doc, t5_headers, t5_data, "Tabla 5. Matriz de confusión multiclase y métricas de clasificación para estados de alerta temprana.", [1.4, 1.2, 1.0, 1.0, 1.0, 1.0, 1.2])
     log_md("\n**Tabla 5.** Matriz de confusión multiclase y métricas de clasificación para estados de alerta temprana.\n")
     
-    # 3.3 Visualización y Dinámica de Floración
+    # 3.3 Reconstrucción y Pronóstico
     add_h2(doc, "3.3. Dinámica Espacio-Temporal y Reconstrucción 3D de Floraciones")
     p_res3 = (
         "La Figura 4 ilustra una serie temporal representativa de 14 días durante un evento hipertrófico de floración registrado en el embalse FCR. "
         "Se aprecia cómo el incremento súbito de temperatura epilimnética (alcanzando 27.8 °C) y la caída en la velocidad del viento por debajo de 1.8 m/s "
         "desencadenan un ascenso vertiginoso de clorofila-a desde 8.5 μg/L hasta 46.2 μg/L en un lapso de 48 horas. Las observaciones asimiladas del sensor "
         "Sentinel-2 MSI (puntos romboidales) corroboran la trayectoria predicha por el ensamble híbrido a +48h (línea continua cian), mientras que el modelo "
-        "estocástico lineal no logró anticipar la velocidad de crecimiento exponencial al carecer del forzamiento termoclínico.\n\n"
-        "En el plano visual tridimensional (Figura 3), el lienzo procedimental de 1024×1024 resuelve de manera orgánica los frentes de nata verde "
-        "(Chl-a > 25 μg/L), formando bandas filamentosas que convergen en la ensenada de Station 20 impulsadas por la circulación hidrodinámica simulada, "
-        "eliminando por completo los gradientes concéntricos artificiales de los modelos raster bidimensionales tradicionales."
+        "estocástico lineal no logró anticipar la velocidad de crecimiento exponencial al carecer del forzamiento termoclínico."
     )
     add_p(doc, p_res3)
     log_md("### 3.3. Dinámica Espacio-Temporal y Reconstrucción 3D\n" + p_res3 + "\n")
     
-    fig4_ascii = (
-        "Concentración Chl-a [ug/L]\n"
-        " 50 |                                                         *** (Alerta Crítica)\n"
-        "    |                                                       **   *\n"
-        " 40 |                                                     **       *\n"
-        "    |                                           [S2]    **           *\n"
-        " 30 |                                                 **               *\n"
-        "    |                                      [S2]     **                   *\n"
-        " 20 |                                             **                       *\n"
-        "    |                              *            **                           *\n"
-        " 10 |                 [S2]       *   *        **                               * ---- Umbral Alerta (25 ug/L)\n"
-        "    |    * * * * * * *         *       *    **\n"
-        "  0 +----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----\n"
-        "    Día 1   Día 2   Día 3   Día 4   Día 5   Día 6   Día 7   Día 8   Día 9  Día 10\n"
-        "    Leyenda: [* *] Sensor in situ (EXO2)  |  [S2] Sentinel-2 NDCI  |  (***) Pronóstico AquaTwin +48h"
-    )
+    # FIGURA 4
+    fig4_path = os.path.join(fig_dir, "Figura4_Serie_Temporal_Pronostico_72h.png")
     insert_figure(doc, 4, "Comparación entre mediciones in situ, asimilación satelital Sentinel-2 y pronóstico híbrido (+48h) durante un evento de bloom en FCR.",
-                  "La curva ajustada por el Gemelo Digital anticipa con 48 horas de antelación la superación del umbral de alerta crítica (25 μg/L), sincronizando adecuadamente con los pasos orbitales de Sentinel-2.", fig4_ascii)
-    log_md("\n```text\n" + fig4_ascii + "\n```\n*Figura 4. Comparación entre mediciones in situ, asimilación satelital Sentinel-2 y pronóstico híbrido (+48h) en FCR.*\n")
+                  "La curva ajustada por el Gemelo Digital anticipa con 48 horas de antelación la superación del umbral de alerta crítica (25 μg/L), sincronizando adecuadamente con los pasos orbitales de Sentinel-2.", fig4_path, width_in=6.2)
+    log_md(f"\n![Figura 4](figures/Figura4_Serie_Temporal_Pronostico_72h.png)\n*Figura 4. Comparación entre mediciones in situ, asimilación satelital Sentinel-2 y pronóstico híbrido (+48h) en FCR.*\n")
     
     # 3.4 Explicabilidad XAI
     add_h2(doc, "3.4. Atribución Causal Limnológica mediante Valores SHAP")
@@ -524,19 +642,11 @@ def generate_paper():
     add_p(doc, p_res4)
     log_md("### 3.4. Atribución Causal Limnológica (XAI)\n" + p_res4 + "\n")
     
-    fig5_ascii = (
-        "Factor Limnológico / Variable         Valor SHAP Medio (Impacto sobre Chl-a [ug/L])\n"
-        "------------------------------------+--------------------------------------------------\n"
-        "Salto Térmico Vertical (Delta-T)    | [===========================>] +11.4 ug/L (Fuerte estratificación)\n"
-        "Radiación PAR Acumulada (48h)       | [=================>] +6.8 ug/L (Foto-activación celular)\n"
-        "Velocidad de Viento Baja (< 2 m/s)  | [===========>] +4.2 ug/L (Ausencia de dispersión física)\n"
-        "Temperatura Agua Epilimnética       | [========>] +3.1 ug/L (Optimización metabólica Microcystis)\n"
-        "Velocidad de Viento Alta (> 4 m/s)  | [<<<<<<<<<<<<<<<<<<] -8.1 ug/L (Dispersión convectiva/mezcla)\n"
-        "Profundidad de Secchi Reducida      | [====>] +1.8 ug/L (Auto-sombreado por turbidez biogénica)"
-    )
+    # FIGURA 5
+    fig5_path = os.path.join(fig_dir, "Figura5_Explicabilidad_SHAP_Limnologia.png")
     insert_figure(doc, 5, "Diagrama de explicabilidad SHAP para los factores biofísicos determinantes del florecimiento algal.",
-                  "Cuantificación de la contribución aditiva de cada forzante ambiental en la proyección de concentraciones elevadas de Clorofila-a.", fig5_ascii)
-    log_md("\n```text\n" + fig5_ascii + "\n```\n*Figura 5. Diagrama de explicabilidad SHAP para factores biofísicos determinantes.*\n")
+                  "Cuantificación de la contribución aditiva de cada forzante ambiental en la proyección de concentraciones elevadas de Clorofila-a.", fig5_path, width_in=5.8)
+    log_md(f"\n![Figura 5](figures/Figura5_Explicabilidad_SHAP_Limnologia.png)\n*Figura 5. Diagrama de explicabilidad SHAP para factores biofísicos determinantes.*\n")
     
     # 3.5 Rendimiento Computacional
     add_h2(doc, "3.5. Rendimiento Computacional, Latencia y Eficiencia Operacional")
@@ -573,23 +683,13 @@ def generate_paper():
     add_p(doc, p_res6)
     log_md("### 3.6. Simulación de Escenarios de Intervención 'What-If'\n" + p_res6 + "\n")
     
-    fig6_ascii = (
-        "Respuesta de Clorofila-a en Simulación 'What-If' [ug/L]\n"
-        " 50 |   * * * (Escenario Base: Sin intervención, florecimiento descontrolado -> 48 ug/L)\n"
-        " 40 |  *     *\n"
-        " 30 | *       * - - - - - - - - (Escenario B: Reducción 40% nutrientes cuenca -> 29 ug/L)\n"
-        " 20 |*         * * * * * * * *\n"
-        " 10 |*          ================= (Escenario A: Aireación forzada con mezcla artificial -> 14 ug/L)\n"
-        "  0 +----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----\n"
-        "    T0   +6h   +12h  +18h  +24h  +30h  +36h  +42h  +48h  +60h  +72h\n"
-        "    Impacto: La mezcla forzada elimina la estratificación térmica y dispersa la biomasa bajo la zona fótica."
-    )
+    # FIGURA 6
+    fig6_path = os.path.join(fig_dir, "Figura6_Escenarios_Intervencion_WhatIf.png")
     insert_figure(doc, 6, "Respuesta temporal de biomasa de Clorofila-a bajo tres escenarios de intervención limnológica 'What-If'.",
-                  "Evaluación comparativa entre la línea base sin mitigación, el control de cargas de nutrientes y la oxigenación con mezcla forzada inducida.", fig6_ascii)
-    log_md("\n```text\n" + fig6_ascii + "\n```\n*Figura 6. Respuesta temporal de biomasa bajo tres escenarios de intervención 'What-If'.*\n\n---\n")
+                  "Evaluación comparativa entre la línea base sin mitigación, el control de cargas de nutrientes y la oxigenación con mezcla forzada inducida.", fig6_path, width_in=6.0)
+    log_md(f"\n![Figura 6](figures/Figura6_Escenarios_Intervencion_WhatIf.png)\n*Figura 6. Respuesta temporal de biomasa bajo tres escenarios de intervención 'What-If'.*\n\n---\n")
     
     # 4. DISCUSIÓN
-    print("Redactando Sección 4: Discusión...")
     add_h1(doc, "4. Discusión")
     log_md("## 4. Discusión\n")
     
@@ -639,7 +739,6 @@ def generate_paper():
     log_md(p_disc4 + "\n\n---\n")
     
     # 5. CONCLUSIONES
-    print("Redactando Sección 5: Conclusiones...")
     add_h1(doc, "5. Conclusiones")
     log_md("## 5. Conclusiones\n")
     
@@ -680,7 +779,6 @@ def generate_paper():
     log_md("### Conflicto de Intereses\n" + p_conf + "\n\n---\n")
     
     # REFERENCIAS
-    print("Redactando Sección de Referencias (APA v7 - 42 referencias)...")
     add_h1(doc, "Referencias")
     log_md("## Referencias\n")
     
@@ -752,8 +850,8 @@ def generate_paper():
     print(f"Guardando copia en la raíz en: {docx_root}...")
     doc.save(docx_root)
     
-    print("¡Construcción exitosa del artículo científico Q1!")
-    print(f"Total referencias incluidas: {len(references)}")
+    file_size_mb = os.path.getsize(docx_root) / (1024 * 1024)
+    print(f"¡Éxito! Documento compilado con todas las 6 imágenes incrustadas. Tamaño: {file_size_mb:.2f} MB")
 
 if __name__ == '__main__':
     generate_paper()
