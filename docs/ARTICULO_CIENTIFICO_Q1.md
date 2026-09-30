@@ -2,10 +2,12 @@
 
 ## *Limnological Digital Twin for Early Warning of Harmful Algal Blooms Through Satellite Data Assimilation and In Situ Sensors*
 
-**Yoel Armando Solórzano Sánchez¹\***
+**Daily Ashley Córdova Urbina¹\*, Yoel Armando Solórzano Sánchez¹**
 
-¹ *Departamento de Informática, Facultad de Ciencias Físicas y Matemáticas, Universidad Nacional de Trujillo, Trujillo 13011, Perú.*  
-\* *Correspondencia:* `ysolorzano@unitru.edu.pe`
+¹ *Escuela Académico Profesional de Ingeniería de Sistemas, Facultad de Ingeniería, Universidad Nacional de Trujillo, Av. Juan Pablo II s/n, Trujillo 13011, Perú.*  
+- **Daily Ashley Córdova Urbina** — ORCID iD: [0009-0008-8433-779X](https://orcid.org/0009-0008-8433-779X) | Correo: `T1043300421@unitru.edu.pe`  
+- **Yoel Armando Solórzano Sánchez** — ORCID iD: [0009-0003-4245-7439](https://orcid.org/0009-0003-4245-7439) | Correo: `ysolorzano@unitru.edu.pe`  
+\* *Autor de correspondencia:* `T1043300421@unitru.edu.pe`
 
 ---
 
@@ -52,7 +54,7 @@ El área de validación experimental corresponde al Embalse Falling Creek (FCR; 
 **Tabla 1.** Características morfológicas, biofísicas y sensores de monitoreo continuo del Embalse Falling Creek (FCR).
 
 ### 2.2. Arquitectura Funcional del Gemelo Digital Limnológico
-La arquitectura del sistema (Figura 1) fue concebida conforme al marco de referencia de gemelos digitales ciberfísicos en ingeniería ambiental (Tao et al., 2020), desacoplada en cuatro capas interoperables: (1) Capa de Ingesta y Asimilación de Datos Ciberfísicos; (2) Capa de Normalización e Imputación Continua (src/gd/serie.ts); (3) Capa de Modelado Físico y Renderizado 3D WebGL (src/components/DigitalTwin3DCanvas.tsx); y (4) Capa de Inferencia Predictiva y Explicabilidad Biofísica (src/gd/prediccion.ts, gd_python/aquatwin/motor/). La comunicación intermodular se gestiona mediante arquitecturas reactivas TypeScript en frontend conectadas mediante sockets RESTful bidireccionales con el microservicio analítico en Python 3.12 (FastAPI).
+La arquitectura del sistema (Figura 1) fue concebida conforme al marco de referencia de gemelos digitales ciberfísicos en ingeniería ambiental (Tao et al., 2020), desacoplada en cuatro capas interoperables: (1) Capa de Ingesta y Asimilación de Datos Ciberfísicos; (2) Capa de Normalización e Imputación Continua de series temporales; (3) Capa de Modelado Físico y Renderizado 3D en WebGL; y (4) Capa de Inferencia Predictiva y Explicabilidad Biofísica. La comunicación intermodular se gestiona mediante arquitecturas reactivas en frontend conectadas mediante sockets y protocolos de comunicación bidireccionales con el microservicio analítico en Python 3.12.
 
 
 ![Figura 1](figures/Figura1_Arquitectura_AquaTwin.png)
@@ -77,7 +79,7 @@ Para la resolución temporal intermedia en días sin paso orbital o con interfer
 **Tabla 2.** Parámetros bio-ópticos, longitudes de onda e índices espectrales asimilados (Sentinel-2 MSI e in situ).
 
 ### 2.4. Modelo Hidrodinámico Capilar y Cinemática de Colonias
-En el archivo fuente [DigitalTwin3DCanvas.tsx](file:///c:/Users/crema/Downloads/aquatwin-hab---3d-digital-twin/src/components/DigitalTwin3DCanvas.tsx#L535-L580), la simulación de la masa de agua abandona la suposición tradicional de plano bidimensional estático. La elevación superficial libre de la malla hídrica η(u, v, t) se resuelve mediante una superposición multiharmónica de ondas gravitocilindricas forzadas por la tensión de cizallamiento del viento U_10:
+En el módulo de simulación hidrodinámica tridimensional del Gemelo Digital (AquaTwin HAB, implementado en WebGL y Three.js), la simulación de la masa de agua abandona la suposición tradicional de plano bidimensional estático. La elevación superficial libre de la malla hídrica η(u, v, t) se resuelve mediante una superposición multiharmónica de ondas gravitocilindricas forzadas por la tensión de cizallamiento del viento U_10:
 
 η(u, v, t) = A₁ · sin(k₁ u + ω₁ t) + A₂ · cos(k₂ v + ω₂ t) + A₃ · sin(k₃(u + v) + ω₃ t)        (3)
 
@@ -99,7 +101,7 @@ Bajo estratificación térmica estival con hipoxia en el fondo (ΔT ≥ 1.0 °C)
 **Tabla 3.** Parámetros físicos e hidrodinámicos calibrados para la simulación 3D de oleaje y cinemática colonial.
 
 ### 2.5. Modelado Híbrido de Pronóstico Temprano
-El motor predictivo (src/gd/prediccion.ts y gd_python/aquatwin/motor/prediccion.py) supera la dicotomía entre modelos puramente físicos y algoritmos puramente estadísticos mediante una arquitectura híbrida de dos niveles informada por la física (Physics-Informed ML; Willard et al., 2021). En el primer nivel, un motor limnológico determinista evalúa la estabilidad térmica de la columna de agua calculando el Índice de Estado Trófico de Carlson (TSI) y el gradiente térmico epilimnio-hipolimnio ΔT:
+El motor predictivo del Gemelo Digital supera la dicotomía entre modelos puramente físicos y algoritmos puramente estadísticos mediante una arquitectura híbrida de dos niveles informada por la física (Physics-Informed ML; Willard et al., 2021). En el primer nivel, un motor limnológico determinista evalúa la estabilidad térmica de la columna de agua calculando el Índice de Estado Trófico de Carlson (TSI) y el gradiente térmico epilimnio-hipolimnio ΔT:
 
 TSI(Chl-a) = 9.81 · ln(Chl-a) + 30.6                                                          (6)
 
@@ -165,7 +167,7 @@ El módulo interactivo de simulación What-If (Figura 6) permitió ensayar virtu
 
 Los hallazgos de este estudio corroboran la hipótesis de que la integración armónica entre asimilación continua, física del epilimnio y gemelos digitales tridimensionales interactivos supera las barreras operacionales de los métodos convencionales. En términos biofísicos, los resultados confirman la teoría limnológica clásica de Reynolds (2006) y Paerl & Huisman (2011) sobre el rol primario del salto térmico vertical (ΔT): mientras exista un gradiente térmico pronunciado entre epilimnio e hipolimnio (ΔT ≥ 1.0 °C), la mezcla turbulenta convectiva queda suprimida y el índice de Brunt-Väisälä alcanza su cénit, creando una trampa física de luz solar que permite a Microcystis aeruginosa mantenerse en suspensión superficial mediante flotabilidad activa mediada por vesículas de gas (Carey et al., 2016).
 
-A diferencia de los modelos puramente estocásticos de caja negra basados en redes neuronales profundas (e.g., LSTMs o transformadores no informados), que tienden a sobreajustar en periodos de transición estacional o predecir picos de crecimiento biológico imposibles sin soporte energético (Willard et al., 2021), la inclusión de las reglas deterministas limnológicas (ecuaciones 6 y 7 en src/gd/reglas.ts) impone cotas biofísicas estrictas. Esto explica por qué el ensamble AquaTwin retiene un R² de 0.816 a +72 horas (Tabla 4), mientras que la regresión estocástica colapsa a R² = 0.648. De igual forma, la atribución causal mediante valores SHAP (Figura 5) proporciona a los gestores de embalses un argumento objetivo y transparente: las alertas emitidas no son un número arbitrario, sino la consecuencia cuantificada del desacoplamiento entre radiación solar y turbulencia de viento.
+A diferencia de los modelos puramente estocásticos de caja negra basados en redes neuronales profundas (e.g., LSTMs o transformadores no informados), que tienden a sobreajustar en periodos de transición estacional o predecir picos de crecimiento biológico imposibles sin soporte energético (Willard et al., 2021), la inclusión de las reglas deterministas limnológicas (ecuaciones 6 y 7 del subsistema de diagnóstico físico) impone cotas biofísicas estrictas. Esto explica por qué el ensamble AquaTwin retiene un R² de 0.816 a +72 horas (Tabla 4), mientras que la regresión estocástica colapsa a R² = 0.648. De igual forma, la atribución causal mediante valores SHAP (Figura 5) proporciona a los gestores de embalses un argumento objetivo y transparente: las alertas emitidas no son un número arbitrario, sino la consecuencia cuantificada del desacoplamiento entre radiación solar y turbulencia de viento.
 
 Desde la perspectiva computacional y gráfica, la reconstrucción biológica implementada en Three.js con 2,400 partículas estocásticas de colonias representa un avance sustancial respecto a las representaciones geoespaciales clásicas. Los mapas térmicos convencionales generan típicamente halos concéntricos o radiales irreales alrededor de los puntos de fondeo de las boyas. Al incorporar la perturbación fractal multiharmónica y la deriva browniana acoplada a la batimetría de FCR, el gemelo digital reproduce con fidelidad los frentes de nata verde (pea-soup scum) que observan los técnicos en campo. Esta fidelidad visual, combinada con un rendimiento sostenido de 59.4 FPS en navegador web (Tabla 6), cierra la brecha entre la ciencia limnológica de alta complejidad y la toma de decisiones táctica de los operadores de potabilización.
 

@@ -5,7 +5,10 @@
 **Tipo de Proyecto:** Software Development (Scrum / Kanban Framework)  
 **Herramientas Asociadas:** Jira Software, Confluence, Bitbucket/GitHub, Streamlit Engine  
 **Dataset de Validación:** Falling Creek Reservoir (`fcr_oapat.csv` - 1,960 observaciones horarias)  
-**Autor:** Yoel Armando Solórzano Sánchez (Universidad Nacional de Trujillo)
+**Autores & Liderazgo Técnico:**  
+- **Daily Ashley Córdova Urbina** (ORCID: [0009-0008-8433-779X](https://orcid.org/0009-0008-8433-779X) | Correo: `T1043300421@unitru.edu.pe`) — *Autor de correspondencia*  
+- **Yoel Armando Solórzano Sánchez** (ORCID: [0009-0003-4245-7439](https://orcid.org/0009-0003-4245-7439) | Correo: `ysolorzano@unitru.edu.pe`)  
+**Institución:** Escuela Académico Profesional de Ingeniería de Sistemas, Facultad de Ingeniería, Universidad Nacional de Trujillo (UNT), Trujillo, Perú.
 
 ---
 

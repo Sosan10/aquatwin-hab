@@ -229,16 +229,33 @@ Para facilitar la revisión por pares, redacción de artículos científicos y r
 Si utilizas este gemelo digital o su código en tu investigación, por favor cita el proyecto de la siguiente manera:
 
 ```bibtex
-@software{solorzano2026aquatwin,
-  author       = {Yoel Armando Solorzano Sanchez},
-  title        = {AquaTwin HAB: 3D Digital Twin & Scientific Framework for Harmful Algal Bloom Forecasting},
+@software{cordova_solorzano2026aquatwin,
+  author       = {Daily Ashley C{\'o}rdova Urbina and Yoel Armando Sol{\'o}rzano S{\'a}nchez},
+  title        = {AquaTwin HAB: Limnological Digital Twin & Scientific Framework for Harmful Algal Bloom Forecasting},
   year         = {2026},
   publisher    = {GitHub},
   journal      = {GitHub repository},
   howpublished = {\url{https://github.com/Sosan10/aquatwin-hab}},
-  note         = {Universidad Nacional de Trujillo. Falling Creek Reservoir Dataset Integration}
+  institution  = {Escuela Acad{\'e}mico Profesional de Ingenier{\'\i}a de Sistemas, Facultad de Ingenier{\'\i}a, Universidad Nacional de Trujillo},
+  address      = {Trujillo, Per{\'u}},
+  note         = {ORCID: 0009-0008-8433-779X, 0009-0003-4245-7439. Falling Creek Reservoir Dataset Integration}
 }
 ```
+
+---
+
+## 👥 Autores e Institución
+
+- **Daily Ashley Córdova Urbina** — *Universidad Nacional de Trujillo*  
+  ORCID iD: [0009-0008-8433-779X](https://orcid.org/0009-0008-8433-779X) | Correo Institucional: `T1043300421@unitru.edu.pe` (*Autor de correspondencia*)
+- **Yoel Armando Solórzano Sánchez** — *Universidad Nacional de Trujillo*  
+  ORCID iD: [0009-0003-4245-7439](https://orcid.org/0009-0003-4245-7439) | Correo Institucional: `ysolorzano@unitru.edu.pe`
+
+**Institución:**  
+UNIVERSIDAD NACIONAL DE TRUJILLO  
+FACULTAD DE INGENIERÍA  
+ESCUELA ACADÉMICO PROFESIONAL DE INGENIERÍA DE SISTEMAS  
+Trujillo, Perú.
 
 ---
 

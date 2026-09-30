@@ -39,7 +39,7 @@ def add_header_footer(doc):
         header = s.header
         hp = header.paragraphs[0]
         hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        hrun = hp.add_run("Water Research / Environmental Modelling & Software — Manuscript (Q1)")
+        hrun = hp.add_run("Water Research / Environmental Modelling & Software — Manuscript Draft (Q1)")
         hrun.font.name = "Times New Roman"
         hrun.font.size = Pt(8.5)
         hrun.font.italic = True
@@ -48,7 +48,7 @@ def add_header_footer(doc):
         footer = s.footer
         fp = footer.paragraphs[0]
         fp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        frun = fp.add_run("Solorzano-Sanchez et al. (2026) — Gemelo Digital Limnológico para Alerta Temprana de HABs")
+        frun = fp.add_run("Córdova-Urbina & Solórzano-Sánchez (2026) — Gemelo Digital Limnológico para Alerta Temprana de HABs")
         frun.font.name = "Times New Roman"
         frun.font.size = Pt(8.5)
         frun.font.color.rgb = RGBColor(148, 163, 184)
@@ -220,21 +220,34 @@ def generate_paper():
     # Authors
     p_auth = doc.add_paragraph()
     p_auth.paragraph_format.space_after = Pt(2)
-    r_a = p_auth.add_run("Yoel Armando Solórzano Sánchez¹*")
-    r_a.font.name = "Times New Roman"
-    r_a.font.size = Pt(11)
-    r_a.font.bold = True
+    r_a1 = p_auth.add_run("Daily Ashley Córdova Urbina¹*, ")
+    r_a1.font.name = "Times New Roman"
+    r_a1.font.size = Pt(11)
+    r_a1.font.bold = True
+    
+    r_a2 = p_auth.add_run("Yoel Armando Solórzano Sánchez¹")
+    r_a2.font.name = "Times New Roman"
+    r_a2.font.size = Pt(11)
+    r_a2.font.bold = True
     
     p_aff = doc.add_paragraph()
     p_aff.paragraph_format.space_after = Pt(14)
-    r_aff = p_aff.add_run("¹ Departamento de Informática, Facultad de Ciencias Físicas y Matemáticas, Universidad Nacional de Trujillo, Av. Juan Pablo II s/n, Trujillo 13011, Perú.\n* Autor de correspondencia: ysolorzano@unitru.edu.pe")
+    r_aff = p_aff.add_run(
+        "¹ Escuela Académico Profesional de Ingeniería de Sistemas, Facultad de Ingeniería, Universidad Nacional de Trujillo, Av. Juan Pablo II s/n, Trujillo 13011, Perú.\n"
+        "• Daily Ashley Córdova Urbina — ORCID iD: https://orcid.org/0009-0008-8433-779X | Correo: T1043300421@unitru.edu.pe\n"
+        "• Yoel Armando Solórzano Sánchez — ORCID iD: https://orcid.org/0009-0003-4245-7439 | Correo: ysolorzano@unitru.edu.pe\n"
+        "* Autor de correspondencia: T1043300421@unitru.edu.pe"
+    )
     r_aff.font.name = "Times New Roman"
     r_aff.font.size = Pt(9.5)
     r_aff.font.italic = True
     r_aff.font.color.rgb = RGBColor(100, 116, 139)
     
-    log_md("**Yoel Armando Solórzano Sánchez¹\***\n")
-    log_md("¹ *Departamento de Informática, Facultad de Ciencias Físicas y Matemáticas, Universidad Nacional de Trujillo, Trujillo 13011, Perú.*  \n\* *Correspondencia:* `ysolorzano@unitru.edu.pe`\n")
+    log_md("**Daily Ashley Córdova Urbina¹\*, Yoel Armando Solórzano Sánchez¹**\n")
+    log_md("¹ *Escuela Académico Profesional de Ingeniería de Sistemas, Facultad de Ingeniería, Universidad Nacional de Trujillo, Av. Juan Pablo II s/n, Trujillo 13011, Perú.*  \n"
+           "- **Daily Ashley Córdova Urbina** — ORCID iD: [0009-0008-8433-779X](https://orcid.org/0009-0008-8433-779X) | Correo: `T1043300421@unitru.edu.pe`  \n"
+           "- **Yoel Armando Solórzano Sánchez** — ORCID iD: [0009-0003-4245-7439](https://orcid.org/0009-0003-4245-7439) | Correo: `ysolorzano@unitru.edu.pe`  \n"
+           "\* *Autor de correspondencia:* `T1043300421@unitru.edu.pe`\n")
     log_md("---\n")
     
     # Abstract ES
@@ -417,10 +430,10 @@ def generate_paper():
     p_arch = (
         "La arquitectura del sistema (Figura 1) fue concebida conforme al marco de referencia de gemelos digitales ciberfísicos en ingeniería "
         "ambiental (Tao et al., 2020), desacoplada en cuatro capas interoperables: (1) Capa de Ingesta y Asimilación de Datos Ciberfísicos; "
-        "(2) Capa de Normalización e Imputación Continua (src/gd/serie.ts); (3) Capa de Modelado Físico y Renderizado 3D WebGL (src/components/DigitalTwin3DCanvas.tsx); "
-        "y (4) Capa de Inferencia Predictiva y Explicabilidad Biofísica (src/gd/prediccion.ts, gd_python/aquatwin/motor/). La comunicación "
-        "intermodular se gestiona mediante arquitecturas reactivas TypeScript en frontend conectadas mediante sockets RESTful bidireccionales "
-        "con el microservicio analítico en Python 3.12 (FastAPI)."
+        "(2) Capa de Normalización e Imputación Continua de series temporales; (3) Capa de Modelado Físico y Renderizado 3D en WebGL; "
+        "y (4) Capa de Inferencia Predictiva y Explicabilidad Biofísica. La comunicación "
+        "intermodular se gestiona mediante arquitecturas reactivas en frontend conectadas mediante sockets y protocolos "
+        "de comunicación bidireccionales con el microservicio analítico en Python 3.12."
     )
     add_p(doc, p_arch)
     log_md("### 2.2. Arquitectura Funcional del Gemelo Digital Limnológico\n" + p_arch + "\n")
@@ -471,7 +484,7 @@ def generate_paper():
     # 2.4 Modelo Hidrodinámico 3D
     add_h2(doc, "2.4. Modelo Hidrodinámico Capilar y Cinemática de Colonias de Microcystis aeruginosa")
     p_hydro = (
-        "En el archivo fuente [DigitalTwin3DCanvas.tsx](file:///c:/Users/crema/Downloads/aquatwin-hab---3d-digital-twin/src/components/DigitalTwin3DCanvas.tsx#L535-L580), "
+        "En el módulo de simulación hidrodinámica tridimensional del Gemelo Digital (AquaTwin HAB, implementado en WebGL y Three.js), "
         "la simulación de la masa de agua abandona la suposición tradicional de plano bidimensional estático. La elevación superficial libre de la "
         "malla hídrica η(u, v, t) se resuelve mediante una superposición multiharmónica de ondas gravitocilindricas forzadas por la tensión de cizallamiento "
         "del viento U_10:\n\n"
@@ -518,7 +531,7 @@ def generate_paper():
     # 2.5 Modelo Híbrido
     add_h2(doc, "2.5. Modelado Híbrido de Pronóstico Temprano (CNN-LSTM y Reglas Físicas)")
     p_ml = (
-        "El motor predictivo (src/gd/prediccion.ts y gd_python/aquatwin/motor/prediccion.py) supera la dicotomía entre modelos puramente físicos "
+        "El motor predictivo del Gemelo Digital supera la dicotomía entre modelos puramente físicos "
         "y algoritmos puramente estadísticos mediante una arquitectura híbrida de dos niveles informada por la física (Physics-Informed ML; Willard et al., 2021). "
         "En el primer nivel, un motor limnológico determinista evalúa la estabilidad térmica de la columna de agua calculando el Índice de Estado Trófico "
         "de Carlson (TSI) y el gradiente térmico epilimnio-hipolimnio ΔT:\n\n"
@@ -707,7 +720,7 @@ def generate_paper():
     p_disc2 = (
         "A diferencia de los modelos puramente estocásticos de caja negra basados en redes neuronales profundas (e.g., LSTMs o transformadores no informados), "
         "que tienden a sobreajustar en periodos de transición estacional o predecir picos de crecimiento biológico imposibles sin soporte energético "
-        "(Willard et al., 2021), la inclusión de las reglas deterministas limnológicas (ecuaciones 6 y 7 en src/gd/reglas.ts) impone cotas biofísicas "
+        "(Willard et al., 2021), la inclusión de las reglas deterministas limnológicas (ecuaciones 6 y 7 del subsistema de diagnóstico físico) impone cotas biofísicas "
         "estrictas. Esto explica por qué el ensamble AquaTwin retiene un R² de 0.816 a +72 horas (Tabla 4), mientras que la regresión estocástica "
         "colapsa a R² = 0.648. De igual forma, la atribución causal mediante valores SHAP (Figura 5) proporciona a los gestores de embalses "
         "un argumento objetivo y transparente: las alertas emitidas no son un número arbitrario, sino la consecuencia cuantificada del desacoplamiento "
@@ -848,10 +861,13 @@ def generate_paper():
     doc.save(docx_file)
     
     print(f"Guardando copia en la raíz en: {docx_root}...")
-    doc.save(docx_root)
-    
-    file_size_mb = os.path.getsize(docx_root) / (1024 * 1024)
-    print(f"¡Éxito! Documento compilado con todas las 6 imágenes incrustadas. Tamaño: {file_size_mb:.2f} MB")
+    try:
+        doc.save(docx_root)
+        print(f"¡Éxito! Archivo guardado en la raíz: {docx_root}")
+    except Exception as e:
+        alt_root = os.path.join(base_dir, "Articulo_Cientifico_Q1_Completo.docx")
+        doc.save(alt_root)
+        print(f"Nota: Archivo raíz guardado en {alt_root} (archivo {docx_root} bloqueado por Word): {e}")
 
 if __name__ == '__main__':
     generate_paper()
