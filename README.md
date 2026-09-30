@@ -128,7 +128,28 @@ cd aquatwin-hab
    npm run build
    ```
 
-### Paso 3: Backend Limnológico en Python (Opcional)
+### Paso 3: Motor Limnológico en Python con Streamlit (CRISP-DM)
+El proyecto incluye un motor interactivo en **Streamlit** que implementa las 7 fases de la metodología **CRISP-DM** sobre el dataset real del embalse Falling Creek (`fcr_oapat.csv`):
+1. **EDA**: Series temporales, distribuciones de frecuencia, detección de outliers y matrices de correlación de Spearman.
+2. **Entrenamiento**: Modelos Ridge, Random Forest, Gradient Boosting y Extra Trees.
+3. **Selección del Mejor Modelo**: Algoritmo de selección multicriterio ($R^2$, RMSE, MAE, KGE, NSE).
+4. **Validación Cruzada**: Evaluación temporal de 5 folds (`TimeSeriesSplit`) sin data leakage.
+5. **Hiperparámetros**: Búsqueda en grilla (`GridSearchCV`) y ranking de configuraciones.
+6. **Pruebas Estadísticas Inferenciales Robustas**: Normalidad (Shapiro-Wilk), t-Student pareado, Wilcoxon signed-rank y Bootstrap IC 95%.
+7. **Generador de Reportes**: Exportación técnica en Markdown y CSV.
+*Toda figura y tabla incluye al pie su correspondiente análisis de **Interpretabilidad y explicabilidad**.*
+
+Para ejecutar la aplicación de Streamlit:
+```bash
+# Opción directa en Windows:
+run_streamlit.bat
+
+# O mediante consola:
+streamlit run streamlit_app.py --server.port 8501
+```
+Abrir en el navegador: `http://localhost:8501`
+
+### Paso 4: Backend Limnológico en Python (FastAPI / OAPAT)
 Si deseas ejecutar la API de Python y los scripts de asimilación de datos ubicados en `gd_python/`:
 
 ```bash
